@@ -1,186 +1,119 @@
-{
-    -- Night Hub FPS Boost UI by Gonzales Official
+--// Night Hub | One-Button FPS Booster
+--// Made by: Gonzales Official
 
-    -- Draggable function (drag anywhere on MainFrame)
-    local function makeDraggable(frame)
-        local UIS = game:GetService("UserInputService")
-        local dragging, dragInput, dragStart, startPos
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local BoostButton = Instance.new("TextButton")
+local Credit = Instance.new("TextLabel")
+local UICorner = Instance.new("UICorner")
+local UIStroke = Instance.new("UIStroke")
 
-        local function update(input)
-            local delta = input.Position - dragStart
-            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-        end
+ScreenGui.Name = "NightHub"
+ScreenGui.Parent = game.CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-        frame.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                dragging = true
-                dragStart = input.Position
-                startPos = frame.Position
-                input.Changed:Connect(function()
-                    if input.UserInputState == Enum.UserInputState.End then
-                        dragging = false
-                    end
-                end)
-            end
-        end)
+-- Main Frame
+Frame.Name = "MainFrame"
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.4, 0, 0.4, 0)
+Frame.Size = UDim2.new(0, 230, 0, 120)
+Frame.Active = true
+Frame.Draggable = true
 
-        UIS.InputChanged:Connect(function(input)
-            if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-                update(input)
-            end
-        end)
-    end
+UICorner.Parent = Frame
+UIStroke.Parent = Frame
+UIStroke.Thickness = 2
 
-    -- Main UI
-    local ScreenGui = Instance.new("ScreenGui")
-    ScreenGui.Parent = game.CoreGui
-    ScreenGui.Name = "NightHubFPS"
+-- Rainbow border animation
+task.spawn(function()
+	while task.wait() do
+		for hue = 0, 255 do
+			UIStroke.Color = Color3.fromHSV(hue / 255, 1, 1)
+			task.wait(0.02)
+		end
+	end
+end)
 
-    local MainFrame = Instance.new("Frame")
-    MainFrame.Size = UDim2.new(0, 320, 0, 200)
-    MainFrame.Position = UDim2.new(0.5, -160, 0.35, 0)
-    MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-    MainFrame.BorderSizePixel = 0
-    MainFrame.Parent = ScreenGui
+-- Boost FPS Button
+BoostButton.Name = "BoostButton"
+BoostButton.Parent = Frame
+BoostButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+BoostButton.BorderSizePixel = 0
+BoostButton.Position = UDim2.new(0.1, 0, 0.25, 0)
+BoostButton.Size = UDim2.new(0.8, 0, 0.4, 0)
+BoostButton.Font = Enum.Font.GothamBold
+BoostButton.Text = "Boost FPS"
+BoostButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+BoostButton.TextSize = 20
+BoostButton.AutoButtonColor = false
+UICorner:Clone().Parent = BoostButton
 
-    makeDraggable(MainFrame)
+-- Hover rainbow text animation
+BoostButton.MouseEnter:Connect(function()
+	task.spawn(function()
+		for hue = 0, 255 do
+			if not BoostButton:IsDescendantOf(game) then break end
+			BoostButton.TextColor3 = Color3.fromHSV(hue / 255, 1, 1)
+			task.wait(0.02)
+		end
+	end)
+end)
 
-    -- Top Bar
-    local TopBar = Instance.new("Frame", MainFrame)
-    TopBar.Size = UDim2.new(1,0,0,32)
-    TopBar.BackgroundColor3 = Color3.fromRGB(35,35,55)
-    TopBar.BorderSizePixel = 0
+BoostButton.MouseLeave:Connect(function()
+	BoostButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+end)
 
-    -- Title
-    local Title = Instance.new("TextLabel", TopBar)
-    Title.Size = UDim2.new(1, -64, 1, 0)
-    Title.Position = UDim2.new(0,0,0,0)
-    Title.Text = "Night Hub - Boost FPS"
-    Title.Font = Enum.Font.SourceSansBold
-    Title.TextSize = 22
-    Title.TextColor3 = Color3.fromRGB(220,220,255)
-    Title.BackgroundTransparency = 1
+-- Credit Label
+Credit.Name = "Credit"
+Credit.Parent = Frame
+Credit.BackgroundTransparency = 1
+Credit.Position = UDim2.new(0, 0, 0.72, 0)
+Credit.Size = UDim2.new(1, 0, 0.25, 0)
+Credit.Font = Enum.Font.Gotham
+Credit.Text = "By: Gonzales Official"
+Credit.TextColor3 = Color3.fromRGB(180, 180, 180)
+Credit.TextSize = 12
+Credit.TextWrapped = true
 
-    -- X Button
-    local XBtn = Instance.new("TextButton", TopBar)
-    XBtn.Size = UDim2.new(0,32, 1, 0)
-    XBtn.Position = UDim2.new(1,-32,0,0)
-    XBtn.Text = "X"
-    XBtn.Font = Enum.Font.SourceSansBold
-    XBtn.TextSize = 24
-    XBtn.BackgroundColor3 = Color3.fromRGB(60,0,0)
-    XBtn.TextColor3 = Color3.new(1,1,1)
-    XBtn.MouseButton1Click:Connect(function()
-        ScreenGui:Destroy()
-    end)
+-- Function: Boost FPS & Reduce Lag
+BoostButton.MouseButton1Click:Connect(function()
+	-- Remove textures and decals
+	for _, v in pairs(workspace:GetDescendants()) do
+		if v:IsA("Texture") or v:IsA("Decal") then v:Destroy() end
+	end
 
-    -- Minimize Button
-    local MinBtn = Instance.new("TextButton", TopBar)
-    MinBtn.Size = UDim2.new(0,32,1,0)
-    MinBtn.Position = UDim2.new(1,-64,0,0)
-    MinBtn.Text = "-"
-    MinBtn.Font = Enum.Font.SourceSansBold
-    MinBtn.TextSize = 24
-    MinBtn.BackgroundColor3 = Color3.fromRGB(40,40,60)
-    MinBtn.TextColor3 = Color3.new(1,1,1)
+	-- Lower graphics
+	settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+	game.Lighting.GlobalShadows = false
+	game.Lighting.FogEnd = 9e9
+	game.Lighting.Brightness = 1
+	game.Lighting.Technology = Enum.Technology.Compatibility
 
-    -- Main Area
-    local MainArea = Instance.new("Frame", MainFrame)
-    MainArea.Size = UDim2.new(1,-24,1,-72)
-    MainArea.Position = UDim2.new(0,12,0,44)
-    MainArea.BackgroundTransparency = 1
+	-- Remove particles, fire, smoke, trails
+	for _, v in pairs(workspace:GetDescendants()) do
+		if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Fire") then
+			v:Destroy()
+		end
+	end
 
-    -- Signature
-    local Signature = Instance.new("TextLabel", MainFrame)
-    Signature.Size = UDim2.new(1,0,0,28)
-    Signature.Position = UDim2.new(0,0,1,-28)
-    Signature.Text = "By: Gonzales Official"
-    Signature.Font = Enum.Font.SourceSans
-    Signature.TextSize = 18
-    Signature.TextColor3 = Color3.fromRGB(180,180,180)
-    Signature.BackgroundTransparency = 1
+	-- Clear accessories for all players
+	for _, plr in pairs(game.Players:GetPlayers()) do
+		if plr.Character then
+			for _, item in pairs(plr.Character:GetChildren()) do
+				if item:IsA("Accessory") then item:Destroy() end
+			end
+		end
+	end
 
-    -- Hide/Show functionality
-    local isHidden = false
-    MinBtn.MouseButton1Click:Connect(function()
-        isHidden = not isHidden
-        MainArea.Visible = not isHidden
-        Signature.Visible = not isHidden
-        if isHidden then
-            MinBtn.Text = "+"
-        else
-            MinBtn.Text = "-"
-        end
-    end)
+	-- Cleanup and optimize memory
+	game:GetService("Debris"):ClearAllChildren()
+	collectgarbage("collect")
+	settings().Network.IncomingReplicationLag = 0
 
-    -- FPS Counter
-    local FPSLabel = Instance.new("TextLabel", MainArea)
-    FPSLabel.Size = UDim2.new(1,0,0,28)
-    FPSLabel.Position = UDim2.new(0,0,0,0)
-    FPSLabel.BackgroundTransparency = 1
-    FPSLabel.Font = Enum.Font.SourceSansBold
-    FPSLabel.TextSize = 20
-    FPSLabel.TextColor3 = Color3.fromRGB(200,255,200)
-    FPSLabel.Text = "FPS: ..."
-
-    -- FPS Calculation
-    local RunService = game:GetService("RunService")
-    local frames, lastTime = 0, tick()
-    RunService.RenderStepped:Connect(function()
-        frames = frames + 1
-        if tick() - lastTime >= 1 then
-            FPSLabel.Text = "FPS: "..frames
-            frames = 0
-            lastTime = tick()
-        end
-    end)
-
-    -- Boost FPS Function (all 4 in one)
-    local function boostFPS()
-        -- 1. Disable shadows & simple lighting
-        local lighting = game:GetService("Lighting")
-        lighting.GlobalShadows = false
-        lighting.Ambient = Color3.fromRGB(128,128,128)
-        lighting.Brightness = 1
-        lighting.FogEnd = 10000
-
-        -- 2. Remove grass & set terrain to gray
-        local terrain = workspace:FindFirstChildOfClass("Terrain")
-        if terrain then
-            terrain.GrassThickness = 0
-            terrain.MaterialColors = {
-                [Enum.Material.Grass] = Color3.fromRGB(128,128,128),
-                [Enum.Material.Ground] = Color3.fromRGB(128,128,128),
-                [Enum.Material.Mud] = Color3.fromRGB(128,128,128),
-            }
-        end
-
-        -- 3. Remove textures/decals & set material to SmoothPlastic
-        for _, v in ipairs(workspace:GetDescendants()) do
-            if v:IsA("Texture") or v:IsA("Decal") then
-                v:Destroy()
-            elseif v:IsA("BasePart") then
-                v.Material = Enum.Material.SmoothPlastic
-                v.Reflectance = 0
-            end
-        end
-
-        -- 4. Disable particle effects (ParticleEmitter, Trail, Smoke, Fire)
-        for _, v in ipairs(workspace:GetDescendants()) do
-            if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Fire") then
-                v.Enabled = false
-            end
-        end
-    end
-
-    -- Main Button
-    local BoostBtn = Instance.new("TextButton", MainArea)
-    BoostBtn.Size = UDim2.new(1,0,0,50)
-    BoostBtn.Position = UDim2.new(0,0,0,32)
-    BoostBtn.Text = "Boost FPS"
-    BoostBtn.Font = Enum.Font.SourceSansBold
-    BoostBtn.TextSize = 28
-    BoostBtn.BackgroundColor3 = Color3.fromRGB(50,50,80)
-    BoostBtn.TextColor3 = Color3.new(1,1,1)
-    BoostBtn.MouseButton1Click:Connect(boostFPS)
-}
+	-- Button feedback
+	BoostButton.Text = "✅ Boosted!"
+	task.wait(2)
+	BoostButton.Text = "Boost FPS"
+end)
