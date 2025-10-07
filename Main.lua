@@ -1,164 +1,186 @@
--- REDZ HUB (REDUSE LAG) - Universal Lag Reducer GUI for Roblox Executors
--- Features: Draggable, big buttons, all functions work, "X" to close, "-" to minimize
--- Enter "555" (type '5' three times) to unlock and show all button functions
+{
+    -- Night Hub FPS Boost UI by Gonzales Official
 
-local RunService = game:GetService("RunService")
-local Lighting = game:GetService("Lighting")
-local UserInputService = game:GetService("UserInputService")
+    -- Draggable function (drag anywhere on MainFrame)
+    local function makeDraggable(frame)
+        local UIS = game:GetService("UserInputService")
+        local dragging, dragInput, dragStart, startPos
 
-local gui = Instance.new("ScreenGui")
-gui.Name = "REDZHUB_LagReducerGUI"
-gui.Parent = game.CoreGui
-
-local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 420, 0, 540)
-frame.Position = UDim2.new(0.5, -210, 0.4, -270)
-frame.BackgroundColor3 = Color3.fromRGB(25,25,25)
-frame.Active = true
-frame.Draggable = true
-
-local title = Instance.new("TextLabel", frame)
-title.Text = "REDZ HUB (REDUSE LAG)"
-title.Size = UDim2.new(1, -80, 0, 60)
-title.Position = UDim2.new(0, 0, 0, 0)
-title.BackgroundTransparency = 1
-title.TextColor3 = Color3.fromRGB(255, 80, 80)
-title.Font = Enum.Font.SourceSansBold
-title.TextSize = 34
-
-local closeBtn = Instance.new("TextButton", frame)
-closeBtn.Text = "X"
-closeBtn.Size = UDim2.new(0, 50, 0, 50)
-closeBtn.Position = UDim2.new(1, -50, 0, 0)
-closeBtn.BackgroundColor3 = Color3.fromRGB(200,50,50)
-closeBtn.TextColor3 = Color3.new(1,1,1)
-closeBtn.Font = Enum.Font.SourceSansBold
-closeBtn.TextSize = 32
-closeBtn.MouseButton1Click:Connect(function()
-    gui:Destroy()
-end)
-
-local minBtn = Instance.new("TextButton", frame)
-minBtn.Text = "-"
-minBtn.Size = UDim2.new(0, 50, 0, 50)
-minBtn.Position = UDim2.new(1, -100, 0, 0)
-minBtn.BackgroundColor3 = Color3.fromRGB(100,100,100)
-minBtn.TextColor3 = Color3.new(1,1,1)
-minBtn.Font = Enum.Font.SourceSansBold
-minBtn.TextSize = 32
-
-local minimized = false
-minBtn.MouseButton1Click:Connect(function()
-    minimized = not minimized
-    for _, v in ipairs(frame:GetChildren()) do
-        if v:IsA("TextButton") or v:IsA("TextLabel") then
-            if v ~= minBtn and v ~= closeBtn and v ~= title then
-                v.Visible = not minimized
-            end
+        local function update(input)
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
-    end
-    frame.Size = minimized and UDim2.new(0, 420, 0, 60) or UDim2.new(0, 420, 0, 540)
-end)
 
-local buttons = {
-    {Name = "Remove Lag", Action = function()
-        settings().RenderingQualityLevel = Enum.QualityLevel.Level01
-    end},
-    {Name = "Clear Lag", Action = function()
-        pcall(function()
-            if workspace:FindFirstChild("Debris") then
-                for _, obj in ipairs(workspace.Debris:GetChildren()) do
-                    obj:Destroy()
-                end
+        frame.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                dragging = true
+                dragStart = input.Position
+                startPos = frame.Position
+                input.Changed:Connect(function()
+                    if input.UserInputState == Enum.UserInputState.End then
+                        dragging = false
+                    end
+                end)
             end
         end)
-    end},
-    {Name = "Lag Destroyer", Action = function()
-        for _, obj in ipairs(workspace:GetChildren()) do
-            if obj:IsA("Explosion") or obj:IsA("Smoke") or obj:IsA("Fire") then
-                obj:Destroy()
+
+        UIS.InputChanged:Connect(function(input)
+            if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                update(input)
+            end
+        end)
+    end
+
+    -- Main UI
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Parent = game.CoreGui
+    ScreenGui.Name = "NightHubFPS"
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Size = UDim2.new(0, 320, 0, 200)
+    MainFrame.Position = UDim2.new(0.5, -160, 0.35, 0)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+    MainFrame.BorderSizePixel = 0
+    MainFrame.Parent = ScreenGui
+
+    makeDraggable(MainFrame)
+
+    -- Top Bar
+    local TopBar = Instance.new("Frame", MainFrame)
+    TopBar.Size = UDim2.new(1,0,0,32)
+    TopBar.BackgroundColor3 = Color3.fromRGB(35,35,55)
+    TopBar.BorderSizePixel = 0
+
+    -- Title
+    local Title = Instance.new("TextLabel", TopBar)
+    Title.Size = UDim2.new(1, -64, 1, 0)
+    Title.Position = UDim2.new(0,0,0,0)
+    Title.Text = "Night Hub - Boost FPS"
+    Title.Font = Enum.Font.SourceSansBold
+    Title.TextSize = 22
+    Title.TextColor3 = Color3.fromRGB(220,220,255)
+    Title.BackgroundTransparency = 1
+
+    -- X Button
+    local XBtn = Instance.new("TextButton", TopBar)
+    XBtn.Size = UDim2.new(0,32, 1, 0)
+    XBtn.Position = UDim2.new(1,-32,0,0)
+    XBtn.Text = "X"
+    XBtn.Font = Enum.Font.SourceSansBold
+    XBtn.TextSize = 24
+    XBtn.BackgroundColor3 = Color3.fromRGB(60,0,0)
+    XBtn.TextColor3 = Color3.new(1,1,1)
+    XBtn.MouseButton1Click:Connect(function()
+        ScreenGui:Destroy()
+    end)
+
+    -- Minimize Button
+    local MinBtn = Instance.new("TextButton", TopBar)
+    MinBtn.Size = UDim2.new(0,32,1,0)
+    MinBtn.Position = UDim2.new(1,-64,0,0)
+    MinBtn.Text = "-"
+    MinBtn.Font = Enum.Font.SourceSansBold
+    MinBtn.TextSize = 24
+    MinBtn.BackgroundColor3 = Color3.fromRGB(40,40,60)
+    MinBtn.TextColor3 = Color3.new(1,1,1)
+
+    -- Main Area
+    local MainArea = Instance.new("Frame", MainFrame)
+    MainArea.Size = UDim2.new(1,-24,1,-72)
+    MainArea.Position = UDim2.new(0,12,0,44)
+    MainArea.BackgroundTransparency = 1
+
+    -- Signature
+    local Signature = Instance.new("TextLabel", MainFrame)
+    Signature.Size = UDim2.new(1,0,0,28)
+    Signature.Position = UDim2.new(0,0,1,-28)
+    Signature.Text = "By: Gonzales Official"
+    Signature.Font = Enum.Font.SourceSans
+    Signature.TextSize = 18
+    Signature.TextColor3 = Color3.fromRGB(180,180,180)
+    Signature.BackgroundTransparency = 1
+
+    -- Hide/Show functionality
+    local isHidden = false
+    MinBtn.MouseButton1Click:Connect(function()
+        isHidden = not isHidden
+        MainArea.Visible = not isHidden
+        Signature.Visible = not isHidden
+        if isHidden then
+            MinBtn.Text = "+"
+        else
+            MinBtn.Text = "-"
+        end
+    end)
+
+    -- FPS Counter
+    local FPSLabel = Instance.new("TextLabel", MainArea)
+    FPSLabel.Size = UDim2.new(1,0,0,28)
+    FPSLabel.Position = UDim2.new(0,0,0,0)
+    FPSLabel.BackgroundTransparency = 1
+    FPSLabel.Font = Enum.Font.SourceSansBold
+    FPSLabel.TextSize = 20
+    FPSLabel.TextColor3 = Color3.fromRGB(200,255,200)
+    FPSLabel.Text = "FPS: ..."
+
+    -- FPS Calculation
+    local RunService = game:GetService("RunService")
+    local frames, lastTime = 0, tick()
+    RunService.RenderStepped:Connect(function()
+        frames = frames + 1
+        if tick() - lastTime >= 1 then
+            FPSLabel.Text = "FPS: "..frames
+            frames = 0
+            lastTime = tick()
+        end
+    end)
+
+    -- Boost FPS Function (all 4 in one)
+    local function boostFPS()
+        -- 1. Disable shadows & simple lighting
+        local lighting = game:GetService("Lighting")
+        lighting.GlobalShadows = false
+        lighting.Ambient = Color3.fromRGB(128,128,128)
+        lighting.Brightness = 1
+        lighting.FogEnd = 10000
+
+        -- 2. Remove grass & set terrain to gray
+        local terrain = workspace:FindFirstChildOfClass("Terrain")
+        if terrain then
+            terrain.GrassThickness = 0
+            terrain.MaterialColors = {
+                [Enum.Material.Grass] = Color3.fromRGB(128,128,128),
+                [Enum.Material.Ground] = Color3.fromRGB(128,128,128),
+                [Enum.Material.Mud] = Color3.fromRGB(128,128,128),
+            }
+        end
+
+        -- 3. Remove textures/decals & set material to SmoothPlastic
+        for _, v in ipairs(workspace:GetDescendants()) do
+            if v:IsA("Texture") or v:IsA("Decal") then
+                v:Destroy()
+            elseif v:IsA("BasePart") then
+                v.Material = Enum.Material.SmoothPlastic
+                v.Reflectance = 0
             end
         end
-    end},
-    {Name = "Boost FPS", Action = function()
-        for _, v in ipairs(Lighting:GetChildren()) do
-            if v:IsA("PostEffect") then
+
+        -- 4. Disable particle effects (ParticleEmitter, Trail, Smoke, Fire)
+        for _, v in ipairs(workspace:GetDescendants()) do
+            if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Fire") then
                 v.Enabled = false
             end
         end
-    end},
-    {Name = "Optimize Game", Action = function()
-        Lighting.GlobalShadows = false
-        Lighting.FogEnd = 100000
-    end},
-    {Name = "Turbo Mode", Action = function()
-        settings().RenderingQualityLevel = Enum.QualityLevel.Level00
-    end},
-    {Name = "Performance Boost", Action = function()
-        for _, obj in ipairs(workspace:GetDescendants()) do
-            if obj:IsA("ParticleEmitter") then
-                obj.Enabled = false
-            end
-        end
-    end},
-    {Name = "Clean Map", Action = function()
-        for _, obj in ipairs(workspace:GetChildren()) do
-            if obj.Name == "Trash" or obj.Name == "Debris" then
-                obj:Destroy()
-            end
-        end
-    end},
-    {Name = "Disable Effects", Action = function()
-        for _, obj in ipairs(Lighting:GetChildren()) do
-            if obj:IsA("PostEffect") then
-                obj.Enabled = false
-            end
-        end
-    end},
-    {Name = "Lag Cleaner", Action = function()
-        for _, obj in ipairs(workspace:GetDescendants()) do
-            if obj:IsA("Smoke") or obj:IsA("Fire") then
-                obj:Destroy()
-            end
-        end
-    end},
-}
-
--- Create buttons but keep them locked (hidden) until "555" is entered
-local buttonObjects = {}
-
-for i, btn in ipairs(buttons) do
-    local button = Instance.new("TextButton", frame)
-    button.Text = btn.Name
-    button.Size = UDim2.new(0.8, 0, 0, 40)
-    button.Position = UDim2.new(0.1, 0, 0, 70 + (i-1)*46)
-    button.BackgroundColor3 = Color3.fromRGB(50, 170, 50)
-    button.TextColor3 = Color3.new(1,1,1)
-    button.Font = Enum.Font.SourceSansBold
-    button.TextSize = 24
-    button.Visible = false -- locked by default
-    button.MouseButton1Click:Connect(btn.Action)
-    buttonObjects[i] = button
-end
-
--- Listen for "555" key sequence, then unlock all buttons automatically
-local keySeq = {}
-
-UserInputService.InputBegan:Connect(function(input, processed)
-    if processed then return end
-    if input.UserInputType == Enum.UserInputType.Keyboard then
-        table.insert(keySeq, input.KeyCode)
-        if #keySeq > 3 then
-            table.remove(keySeq, 1)
-        end
-        if keySeq[1] == Enum.KeyCode.Five and keySeq[2] == Enum.KeyCode.Five and keySeq[3] == Enum.KeyCode.Five then
-            for _, button in ipairs(buttonObjects) do
-                button.Visible = true
-            end
-        end
     end
-end)
 
--- Tab is always enabled unless closed
-gui.Enabled = true
-frame.Visible = true
+    -- Main Button
+    local BoostBtn = Instance.new("TextButton", MainArea)
+    BoostBtn.Size = UDim2.new(1,0,0,50)
+    BoostBtn.Position = UDim2.new(0,0,0,32)
+    BoostBtn.Text = "Boost FPS"
+    BoostBtn.Font = Enum.Font.SourceSansBold
+    BoostBtn.TextSize = 28
+    BoostBtn.BackgroundColor3 = Color3.fromRGB(50,50,80)
+    BoostBtn.TextColor3 = Color3.new(1,1,1)
+    BoostBtn.MouseButton1Click:Connect(boostFPS)
+}
