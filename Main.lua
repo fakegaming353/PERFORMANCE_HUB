@@ -1,119 +1,185 @@
---// Night Hub | One-Button FPS Booster
---// Made by: Gonzales Official
+-- Night Hub | FPS Booster + Bug Report
+-- Made by: Gonzales Official
 
-local ScreenGui = Instance.new("ScreenGui")
-local Frame = Instance.new("Frame")
-local BoostButton = Instance.new("TextButton")
-local Credit = Instance.new("TextLabel")
-local UICorner = Instance.new("UICorner")
-local UIStroke = Instance.new("UIStroke")
+local player = game.Players.LocalPlayer
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "NightHub"
 
-ScreenGui.Name = "NightHub"
-ScreenGui.Parent = game.CoreGui
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+--------------------------------------------------------------------
+-- Frame
+--------------------------------------------------------------------
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 300, 0, 150)
+frame.Position = UDim2.new(0.35, 0, 0.35, 0)
+frame.BackgroundColor3 = Color3.fromRGB(15,15,15)
+frame.Active = true
+frame.Draggable = true
 
--- Main Frame
-Frame.Name = "MainFrame"
-Frame.Parent = ScreenGui
-Frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-Frame.BorderSizePixel = 0
-Frame.Position = UDim2.new(0.4, 0, 0.4, 0)
-Frame.Size = UDim2.new(0, 230, 0, 120)
-Frame.Active = true
-Frame.Draggable = true
-
-UICorner.Parent = Frame
-UIStroke.Parent = Frame
-UIStroke.Thickness = 2
+local corner = Instance.new("UICorner", frame)
+local stroke = Instance.new("UIStroke", frame)
+stroke.Thickness = 3
 
 -- Rainbow border animation
 task.spawn(function()
 	while task.wait() do
-		for hue = 0, 255 do
-			UIStroke.Color = Color3.fromHSV(hue / 255, 1, 1)
+		for h = 0, 255 do
+			stroke.Color = Color3.fromHSV(h/255,1,1)
 			task.wait(0.02)
 		end
 	end
 end)
 
+--------------------------------------------------------------------
 -- Boost FPS Button
-BoostButton.Name = "BoostButton"
-BoostButton.Parent = Frame
-BoostButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-BoostButton.BorderSizePixel = 0
-BoostButton.Position = UDim2.new(0.1, 0, 0.25, 0)
-BoostButton.Size = UDim2.new(0.8, 0, 0.4, 0)
-BoostButton.Font = Enum.Font.GothamBold
-BoostButton.Text = "Boost FPS"
-BoostButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-BoostButton.TextSize = 20
-BoostButton.AutoButtonColor = false
-UICorner:Clone().Parent = BoostButton
+--------------------------------------------------------------------
+local boostBtn = Instance.new("TextButton", frame)
+boostBtn.Size = UDim2.new(0.6,0,0.35,0)
+boostBtn.Position = UDim2.new(0.2,0,0.15,0)
+boostBtn.Text = "Boost FPS"
+boostBtn.Font = Enum.Font.GothamBold
+boostBtn.TextSize = 20
+boostBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
+boostBtn.TextColor3 = Color3.new(1,1,1)
+boostBtn.AutoButtonColor = false
+Instance.new("UICorner", boostBtn)
 
 -- Hover rainbow text animation
-BoostButton.MouseEnter:Connect(function()
+boostBtn.MouseEnter:Connect(function()
 	task.spawn(function()
-		for hue = 0, 255 do
-			if not BoostButton:IsDescendantOf(game) then break end
-			BoostButton.TextColor3 = Color3.fromHSV(hue / 255, 1, 1)
+		for h=0,255 do
+			if not boostBtn:IsDescendantOf(game) then break end
+			boostBtn.TextColor3 = Color3.fromHSV(h/255,1,1)
 			task.wait(0.02)
 		end
 	end)
 end)
-
-BoostButton.MouseLeave:Connect(function()
-	BoostButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+boostBtn.MouseLeave:Connect(function()
+	boostBtn.TextColor3 = Color3.new(1,1,1)
 end)
 
--- Credit Label
-Credit.Name = "Credit"
-Credit.Parent = Frame
-Credit.BackgroundTransparency = 1
-Credit.Position = UDim2.new(0, 0, 0.72, 0)
-Credit.Size = UDim2.new(1, 0, 0.25, 0)
-Credit.Font = Enum.Font.Gotham
-Credit.Text = "By: Gonzales Official"
-Credit.TextColor3 = Color3.fromRGB(180, 180, 180)
-Credit.TextSize = 12
-Credit.TextWrapped = true
-
--- Function: Boost FPS & Reduce Lag
-BoostButton.MouseButton1Click:Connect(function()
-	-- Remove textures and decals
-	for _, v in pairs(workspace:GetDescendants()) do
-		if v:IsA("Texture") or v:IsA("Decal") then v:Destroy() end
+-- Boost FPS function with 2s delay
+boostBtn.MouseButton1Click:Connect(function()
+	boostBtn.Text = "Processing..."
+	task.wait(2)
+	-- Remove decals and textures
+	for _,v in pairs(workspace:GetDescendants()) do
+		if v:IsA("Decal") or v:IsA("Texture") then v:Destroy() end
 	end
-
-	-- Lower graphics
-	settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+	-- Remove grass colors
+	if workspace:FindFirstChild("Terrain") then
+		workspace.Terrain.WaterWaveSize = 0
+		workspace.Terrain.WaterWaveSpeed = 0
+		workspace.Terrain.WaterReflectance = 0
+		workspace.Terrain.WaterTransparency = 1
+		workspace.Terrain:SetMaterialColor(Enum.Material.Grass, Color3.new(0.5,0.5,0.5))
+	end
+	-- Lighting cleanup
 	game.Lighting.GlobalShadows = false
-	game.Lighting.FogEnd = 9e9
+	game.Lighting.FogEnd = 1e6
 	game.Lighting.Brightness = 1
+	game.Lighting.OutdoorAmbient = Color3.fromRGB(255,255,255)
 	game.Lighting.Technology = Enum.Technology.Compatibility
-
-	-- Remove particles, fire, smoke, trails
-	for _, v in pairs(workspace:GetDescendants()) do
+	-- Remove heavy particles
+	for _,v in pairs(workspace:GetDescendants()) do
 		if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke") or v:IsA("Fire") then
 			v:Destroy()
 		end
 	end
+	boostBtn.Text = "✅ Boosted!"
+	task.wait(2)
+	boostBtn.Text = "Boost FPS"
+end)
 
-	-- Clear accessories for all players
-	for _, plr in pairs(game.Players:GetPlayers()) do
-		if plr.Character then
-			for _, item in pairs(plr.Character:GetChildren()) do
-				if item:IsA("Accessory") then item:Destroy() end
-			end
+--------------------------------------------------------------------
+-- Report Bug Button
+--------------------------------------------------------------------
+local reportBtn = Instance.new("TextButton", frame)
+reportBtn.Size = UDim2.new(0.6,0,0.25,0)
+reportBtn.Position = UDim2.new(0.2,0,0.65,0)
+reportBtn.Text = "Report Bug"
+reportBtn.Font = Enum.Font.GothamBold
+reportBtn.TextSize = 18
+reportBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
+reportBtn.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", reportBtn)
+
+-- Hover rainbow text animation
+reportBtn.MouseEnter:Connect(function()
+	task.spawn(function()
+		for h=0,255 do
+			if not reportBtn:IsDescendantOf(game) then break end
+			reportBtn.TextColor3 = Color3.fromHSV(h/255,1,1)
+			task.wait(0.02)
+		end
+	end)
+end)
+reportBtn.MouseLeave:Connect(function()
+	reportBtn.TextColor3 = Color3.new(1,1,1)
+end)
+
+-- Open Discord link
+reportBtn.MouseButton1Click:Connect(function()
+	local success, result = pcall(function()
+		return game:GetService("Players").LocalPlayer:Kick("Opening Discord: https://discord.gg/v65zvUw2xk")
+	end)
+end)
+
+--------------------------------------------------------------------
+-- Rainbow Name Label
+--------------------------------------------------------------------
+local credit = Instance.new("TextLabel", frame)
+credit.BackgroundTransparency = 1
+credit.Position = UDim2.new(0,0,0.92,0)
+credit.Size = UDim2.new(1,0,0.08,0)
+credit.Font = Enum.Font.GothamBold
+credit.Text = "By: Gonzales Official"
+credit.TextSize = 14
+credit.TextColor3 = Color3.fromHSV(0,1,1)
+
+-- Rainbow animation for name
+task.spawn(function()
+	while task.wait() do
+		for h = 0,255 do
+			credit.TextColor3 = Color3.fromHSV(h/255,1,1)
+			task.wait(0.02)
 		end
 	end
+end)
 
-	-- Cleanup and optimize memory
-	game:GetService("Debris"):ClearAllChildren()
-	collectgarbage("collect")
-	settings().Network.IncomingReplicationLag = 0
+--------------------------------------------------------------------
+-- FPS Counter (top-right)
+--------------------------------------------------------------------
+local fpsLabel = Instance.new("TextLabel", gui)
+fpsLabel.Size = UDim2.new(0,150,0,40)
+fpsLabel.Position = UDim2.new(0.85,0,0.05,0)
+fpsLabel.BackgroundTransparency = 0.3
+fpsLabel.BackgroundColor3 = Color3.fromRGB(15,15,15)
+fpsLabel.Font = Enum.Font.GothamBold
+fpsLabel.TextScaled = true
+fpsLabel.Text = "FPS: 0"
+fpsLabel.TextColor3 = Color3.new(1,1,1)
+local fpsStroke = Instance.new("UIStroke", fpsLabel)
+fpsStroke.Thickness = 2
 
-	-- Button feedback
-	BoostButton.Text = "✅ Boosted!"
-	task.wait(2)
-	BoostButton.Text = "Boost FPS"
+-- Rainbow FPS + real count
+local last, frames, fps = tick(), 0, 0
+task.spawn(function()
+	while task.wait(0.03) do
+		for h = 0,255 do
+			local c = Color3.fromHSV(h/255,1,1)
+			fpsLabel.TextColor3 = c
+			fpsStroke.Color = c
+			task.wait(0.02)
+		end
+	end
+end)
+
+game:GetService("RunService").RenderStepped:Connect(function()
+	frames += 1
+	local now = tick()
+	if now - last >= 1 then
+		fps = frames / (now - last)
+		last, frames = now, 0
+		fpsLabel.Text = string.format("FPS: %.0f", fps)
+	end
 end)
