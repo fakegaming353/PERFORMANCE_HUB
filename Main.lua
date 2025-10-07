@@ -9,8 +9,8 @@ gui.Name = "NightHub"
 -- Floating Frame (small corner HUD)
 --------------------------------------------------
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 160, 0, 80) -- tiny small
-frame.Position = UDim2.new(0.02, 0, 0.02, 0) -- top-left corner
+frame.Size = UDim2.new(0, 160, 0, 160) -- increased height for key input
+frame.Position = UDim2.new(0.02, 0, 0.02, 0)
 frame.BackgroundColor3 = Color3.fromRGB(15,15,15)
 frame.Active = true
 frame.Draggable = true
@@ -30,30 +30,129 @@ task.spawn(function()
 end)
 
 --------------------------------------------------
--- Boost Fps Button (tiny, flat style)
+-- Key System
+--------------------------------------------------
+local keyLabel = Instance.new("TextLabel", frame)
+keyLabel.Size = UDim2.new(0.8, 0, 0.1, 0)
+keyLabel.Position = UDim2.new(0.1, 0, 0.05, 0)
+keyLabel.BackgroundTransparency = 1
+keyLabel.Text = "Enter Key:"
+keyLabel.Font = Enum.Font.GothamBold
+keyLabel.TextSize = 12
+keyLabel.TextScaled = true
+keyLabel.TextXAlignment = Enum.TextXAlignment.Center
+keyLabel.TextYAlignment = Enum.TextYAlignment.Center
+
+-- Rainbow effect for key label
+task.spawn(function()
+	while task.wait() do
+		for h = 0, 255 do
+			keyLabel.TextColor3 = Color3.fromHSV(h/255,1,1)
+			task.wait(0.02)
+		end
+	end
+end)
+
+local keyBox = Instance.new("TextBox", frame)
+keyBox.Size = UDim2.new(0.8,0,0.1,0)
+keyBox.Position = UDim2.new(0.1,0,0.15,0)
+keyBox.Text = ""
+keyBox.ClearTextOnFocus = true
+keyBox.BackgroundColor3 = Color3.fromRGB(40,40,40)
+keyBox.TextColor3 = Color3.fromRGB(255,255,255)
+keyBox.Font = Enum.Font.GothamBold
+keyBox.TextSize = 12
+keyBox.TextScaled = true
+keyBox.TextXAlignment = Enum.TextXAlignment.Center
+keyBox.TextYAlignment = Enum.TextYAlignment.Center
+Instance.new("UICorner", keyBox)
+
+local unlockBtn = Instance.new("TextButton", frame)
+unlockBtn.Size = UDim2.new(0.8,0,0.1,0)
+unlockBtn.Position = UDim2.new(0.1,0,0.27,0)
+unlockBtn.Text = "Unlock"
+unlockBtn.Font = Enum.Font.GothamBold
+unlockBtn.TextSize = 14
+unlockBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
+unlockBtn.TextColor3 = Color3.fromRGB(255,255,255)
+unlockBtn.AutoButtonColor = false
+Instance.new("UICorner", unlockBtn)
+
+--------------------------------------------------
+-- Boost Fps Button (locked initially)
 --------------------------------------------------
 local boostBtn = Instance.new("TextButton", frame)
-boostBtn.Size = UDim2.new(0.8,0,0.3,0)
-boostBtn.Position = UDim2.new(0.1,0,0.1,0)
+boostBtn.Size = UDim2.new(0.8,0,0.15,0)
+boostBtn.Position = UDim2.new(0.1,0,0.4,0)
 boostBtn.Text = "Boost Fps"
 boostBtn.Font = Enum.Font.GothamBold
 boostBtn.TextSize = 14
-boostBtn.BackgroundColor3 = Color3.fromRGB(60,60,60) -- flat/disabled style
+boostBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
 boostBtn.TextColor3 = Color3.fromRGB(255,255,255)
 boostBtn.AutoButtonColor = false
+boostBtn.Active = false
+boostBtn.Visible = false
 Instance.new("UICorner", boostBtn)
 
--- Recommended Phone label
+-- Recommended For Mobile label
 local recLabel = Instance.new("TextLabel", frame)
-recLabel.Size = UDim2.new(0.8,0,0.1,0)
-recLabel.Position = UDim2.new(0.1,0,0.36,0)
+recLabel.Size = UDim2.new(0.8, 0, 0.1, 0)
+recLabel.Position = UDim2.new(0.1, 0, 0.56, 0)
 recLabel.BackgroundTransparency = 1
-recLabel.Text = "Recommended Phone"
+recLabel.Text = "Recommended For Mobile"
 recLabel.Font = Enum.Font.Gotham
 recLabel.TextSize = 10
 recLabel.TextColor3 = Color3.fromRGB(200,200,200)
+recLabel.TextScaled = true
+recLabel.TextXAlignment = Enum.TextXAlignment.Center
+recLabel.TextYAlignment = Enum.TextYAlignment.Center
 
+-- Report Bug Button (locked initially)
+local reportBtn = Instance.new("TextButton", frame)
+reportBtn.Size = UDim2.new(0.8,0,0.15,0)
+reportBtn.Position = UDim2.new(0.1,0,0.68,0)
+reportBtn.Text = "Report Bug"
+reportBtn.Font = Enum.Font.GothamBold
+reportBtn.TextSize = 12
+reportBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
+reportBtn.TextColor3 = Color3.new(1,1,1)
+reportBtn.AutoButtonColor = false
+reportBtn.Active = false
+reportBtn.Visible = false
+Instance.new("UICorner", reportBtn)
+
+local discordLink = "https://discord.gg/v65zvUw2xk"
+reportBtn.MouseButton1Click:Connect(function()
+	pcall(function()
+		setclipboard(discordLink)
+		reportBtn.Text = "Copied!"
+		task.wait(2)
+		reportBtn.Text = "Report Bug"
+	end)
+end)
+
+--------------------------------------------------
+-- Unlock system logic
+--------------------------------------------------
+unlockBtn.MouseButton1Click:Connect(function()
+	if keyBox.Text == "555" then
+		boostBtn.Active = true
+		boostBtn.Visible = true
+		reportBtn.Active = true
+		reportBtn.Visible = true
+		unlockBtn.Text = "✅ Unlocked!"
+		task.wait(2)
+		unlockBtn.Visible = false
+	else
+		unlockBtn.Text = "❌ Wrong Key"
+		task.wait(2)
+		unlockBtn.Text = "Unlock"
+	end
+end)
+
+--------------------------------------------------
 -- Boost FPS functionality
+--------------------------------------------------
 boostBtn.MouseButton1Click:Connect(function()
 	boostBtn.Text = "Processing..."
 	task.wait(2)
@@ -83,29 +182,6 @@ boostBtn.MouseButton1Click:Connect(function()
 end)
 
 --------------------------------------------------
--- Report Bug Button (tiny, auto-copy)
---------------------------------------------------
-local reportBtn = Instance.new("TextButton", frame)
-reportBtn.Size = UDim2.new(0.8,0,0.25,0)
-reportBtn.Position = UDim2.new(0.1,0,0.55,0)
-reportBtn.Text = "Report Bug"
-reportBtn.Font = Enum.Font.GothamBold
-reportBtn.TextSize = 12
-reportBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
-reportBtn.TextColor3 = Color3.new(1,1,1)
-Instance.new("UICorner", reportBtn)
-
-local discordLink = "https://discord.gg/v65zvUw2xk"
-reportBtn.MouseButton1Click:Connect(function()
-	pcall(function()
-		setclipboard(discordLink)
-		reportBtn.Text = "Copied!"
-		task.wait(2)
-		reportBtn.Text = "Report Bug"
-	end)
-end)
-
---------------------------------------------------
 -- Rainbow Name under button
 --------------------------------------------------
 local credit = Instance.new("TextLabel", frame)
@@ -128,13 +204,15 @@ end)
 -- Tiny Rainbow FPS Counter
 --------------------------------------------------
 local fpsLabel = Instance.new("TextLabel", gui)
-fpsLabel.Size = UDim2.new(0,50,0,15)
-fpsLabel.Position = UDim2.new(0.42,0,0.02,0)
+fpsLabel.Size = UDim2.new(0,60,0,15)
+fpsLabel.Position = UDim2.new(0.5, -30, 0.02, 0)
 fpsLabel.BackgroundTransparency = 0.3
 fpsLabel.BackgroundColor3 = Color3.fromRGB(15,15,15)
 fpsLabel.Font = Enum.Font.GothamBold
 fpsLabel.TextSize = 10
 fpsLabel.Text = "FPS: 0"
+fpsLabel.TextXAlignment = Enum.TextXAlignment.Center
+fpsLabel.TextYAlignment = Enum.TextYAlignment.Center
 local fpsStroke = Instance.new("UIStroke", fpsLabel)
 fpsStroke.Thickness = 1
 
