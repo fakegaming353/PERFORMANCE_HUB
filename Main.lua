@@ -1,49 +1,49 @@
--- Night Hub | FPS Booster + Bug Report
--- Made by: Gonzales Official
+-- Night Hub | Compact Version
+-- By: Gonzales Official
 
 local player = game.Players.LocalPlayer
 local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
 gui.Name = "NightHub"
 
---------------------------------------------------------------------
--- Frame
---------------------------------------------------------------------
+--------------------------------------------------
+-- Compact Frame
+--------------------------------------------------
 local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 300, 0, 150)
-frame.Position = UDim2.new(0.35, 0, 0.35, 0)
+frame.Size = UDim2.new(0, 200, 0, 100) -- smaller
+frame.Position = UDim2.new(0.4, 0, 0.4, 0)
 frame.BackgroundColor3 = Color3.fromRGB(15,15,15)
 frame.Active = true
 frame.Draggable = true
 
 local corner = Instance.new("UICorner", frame)
 local stroke = Instance.new("UIStroke", frame)
-stroke.Thickness = 3
+stroke.Thickness = 2
 
--- Rainbow border animation
+-- Rainbow border
 task.spawn(function()
 	while task.wait() do
-		for h = 0, 255 do
+		for h=0,255 do
 			stroke.Color = Color3.fromHSV(h/255,1,1)
 			task.wait(0.02)
 		end
 	end
 end)
 
---------------------------------------------------------------------
--- Boost FPS Button
---------------------------------------------------------------------
+--------------------------------------------------
+-- Boost FPS Button (small)
+--------------------------------------------------
 local boostBtn = Instance.new("TextButton", frame)
-boostBtn.Size = UDim2.new(0.6,0,0.35,0)
-boostBtn.Position = UDim2.new(0.2,0,0.15,0)
+boostBtn.Size = UDim2.new(0.8,0,0.3,0)
+boostBtn.Position = UDim2.new(0.1,0,0.1,0)
 boostBtn.Text = "Boost FPS"
 boostBtn.Font = Enum.Font.GothamBold
-boostBtn.TextSize = 20
+boostBtn.TextSize = 16 -- smaller text
 boostBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
 boostBtn.TextColor3 = Color3.new(1,1,1)
 boostBtn.AutoButtonColor = false
 Instance.new("UICorner", boostBtn)
 
--- Hover rainbow text animation
+-- Hover rainbow
 boostBtn.MouseEnter:Connect(function()
 	task.spawn(function()
 		for h=0,255 do
@@ -57,11 +57,10 @@ boostBtn.MouseLeave:Connect(function()
 	boostBtn.TextColor3 = Color3.new(1,1,1)
 end)
 
--- Boost FPS function with 2s delay
 boostBtn.MouseButton1Click:Connect(function()
 	boostBtn.Text = "Processing..."
 	task.wait(2)
-	-- Remove decals and textures
+	-- Remove decals & textures
 	for _,v in pairs(workspace:GetDescendants()) do
 		if v:IsA("Decal") or v:IsA("Texture") then v:Destroy() end
 	end
@@ -90,20 +89,20 @@ boostBtn.MouseButton1Click:Connect(function()
 	boostBtn.Text = "Boost FPS"
 end)
 
---------------------------------------------------------------------
--- Report Bug Button
---------------------------------------------------------------------
+--------------------------------------------------
+-- Report Bug Button (small)
+--------------------------------------------------
 local reportBtn = Instance.new("TextButton", frame)
-reportBtn.Size = UDim2.new(0.6,0,0.25,0)
-reportBtn.Position = UDim2.new(0.2,0,0.65,0)
+reportBtn.Size = UDim2.new(0.8,0,0.25,0)
+reportBtn.Position = UDim2.new(0.1,0,0.55,0)
 reportBtn.Text = "Report Bug"
 reportBtn.Font = Enum.Font.GothamBold
-reportBtn.TextSize = 18
+reportBtn.TextSize = 14
 reportBtn.BackgroundColor3 = Color3.fromRGB(30,30,30)
 reportBtn.TextColor3 = Color3.new(1,1,1)
 Instance.new("UICorner", reportBtn)
 
--- Hover rainbow text animation
+-- Hover rainbow
 reportBtn.MouseEnter:Connect(function()
 	task.spawn(function()
 		for h=0,255 do
@@ -117,55 +116,59 @@ reportBtn.MouseLeave:Connect(function()
 	reportBtn.TextColor3 = Color3.new(1,1,1)
 end)
 
--- Open Discord link
+-- Auto copy Discord link
+local discordLink = "https://discord.gg/v65zvUw2xk"
 reportBtn.MouseButton1Click:Connect(function()
-	local success, result = pcall(function()
-		return game:GetService("Players").LocalPlayer:Kick("Opening Discord: https://discord.gg/v65zvUw2xk")
+	pcall(function()
+		setclipboard(discordLink)
+		reportBtn.Text = "Copied!"
+		task.wait(2)
+		reportBtn.Text = "Report Bug"
 	end)
 end)
 
---------------------------------------------------------------------
--- Rainbow Name Label
---------------------------------------------------------------------
+--------------------------------------------------
+-- Rainbow Name
+--------------------------------------------------
 local credit = Instance.new("TextLabel", frame)
 credit.BackgroundTransparency = 1
-credit.Position = UDim2.new(0,0,0.92,0)
-credit.Size = UDim2.new(1,0,0.08,0)
+credit.Position = UDim2.new(0,0,0.85,0)
+credit.Size = UDim2.new(1,0,0.1,0)
 credit.Font = Enum.Font.GothamBold
 credit.Text = "By: Gonzales Official"
-credit.TextSize = 14
+credit.TextSize = 12 -- smaller
 credit.TextColor3 = Color3.fromHSV(0,1,1)
 
--- Rainbow animation for name
 task.spawn(function()
 	while task.wait() do
-		for h = 0,255 do
+		for h=0,255 do
 			credit.TextColor3 = Color3.fromHSV(h/255,1,1)
 			task.wait(0.02)
 		end
 	end
 end)
 
---------------------------------------------------------------------
--- FPS Counter (top-right)
---------------------------------------------------------------------
+--------------------------------------------------
+-- Small FPS Counter (centered)
+--------------------------------------------------
 local fpsLabel = Instance.new("TextLabel", gui)
-fpsLabel.Size = UDim2.new(0,150,0,40)
-fpsLabel.Position = UDim2.new(0.85,0,0.05,0)
+fpsLabel.Size = UDim2.new(0,60,0,15)
+fpsLabel.Position = UDim2.new(0.47,0,0.05,0)
 fpsLabel.BackgroundTransparency = 0.3
 fpsLabel.BackgroundColor3 = Color3.fromRGB(15,15,15)
 fpsLabel.Font = Enum.Font.GothamBold
-fpsLabel.TextScaled = true
+fpsLabel.TextScaled = false
+fpsLabel.TextSize = 12
 fpsLabel.Text = "FPS: 0"
-fpsLabel.TextColor3 = Color3.new(1,1,1)
+fpsLabel.TextColor3 = Color3.fromHSV(0,1,1)
 local fpsStroke = Instance.new("UIStroke", fpsLabel)
-fpsStroke.Thickness = 2
+fpsStroke.Thickness = 1
 
 -- Rainbow FPS + real count
-local last, frames, fps = tick(), 0, 0
+local last, frames, fps = tick(),0,0
 task.spawn(function()
 	while task.wait(0.03) do
-		for h = 0,255 do
+		for h=0,255 do
 			local c = Color3.fromHSV(h/255,1,1)
 			fpsLabel.TextColor3 = c
 			fpsStroke.Color = c
